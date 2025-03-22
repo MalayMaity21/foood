@@ -88,7 +88,10 @@ const loginUser = async (req, res) => {
 // Function to get a single user by ID
 const singleUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id); // Fetch user by ID from token
+    const userId = req.params.id; // Get user ID from request parameters
+
+    // Fetch user by ID from MongoDB
+    const user = await User.findById(userId).select('-password'); // Exclude password field
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

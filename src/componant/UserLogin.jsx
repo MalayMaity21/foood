@@ -22,7 +22,7 @@ function UserLogin({ theme, toggleTheme }) {
 
     try {
       // Call the backend API for login
-      const response = await fetch("http://localhost:8080/users/login", {
+      const response = await fetch("http://localhost:8080/api/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -34,7 +34,7 @@ function UserLogin({ theme, toggleTheme }) {
 
       if (response.ok) {
         localStorage.setItem("token", data.token); // Save token to localStorage
-        setUser({ userName: data.userName, email: data.email }); // Update user context
+        setUser({ id: data.user.id, userName: data.user.userName, email: data.user.email }); // Update user context
         setSuccess(true); // Show success message
         setError(""); // Clear any previous error
 

@@ -82,7 +82,7 @@ function App() {
             <Route path="/restaurant-login" element={<RestaurantLogin theme={theme} />} />
             <Route path="/restaurant_page" element={<RestaurantPage theme={theme} />} />
             <Route path="/productDetails/:id" element={<ProductDetails theme={theme} />} />
-            <Route path="/profile" element={<ProfileDashboard theme={theme} />} />
+            <Route path="/profile/username/:userName" element={<ProfileDashboard theme={theme} />} />
           </Routes>
 
           <footer className={`footer ${theme === 'dark' ? 'dark-theme' : 'light-theme'}`}>

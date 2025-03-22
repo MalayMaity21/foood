@@ -4,12 +4,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/NavBar.css';
 import dishes from '../services/api.json';
 import { UserContext } from '../context/UserContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faShoppingCart, faUser } from '@fortawesome/free-solid-svg-icons';
 
-function NavBar({ isDarkMode, toggleTheme, cart }) {
+function NavBar({ isDarkMode, toggleTheme, cart = [] }) {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const { user, setUser } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext); // Accessing the user context
 
   // Handle Admin Login click
   const handleAdminLoginClick = () => {
@@ -37,8 +39,40 @@ function NavBar({ isDarkMode, toggleTheme, cart }) {
   };
 
   // Handle Profile Click
-  const handleProfileClick = () => {
-    navigate('/profile'); // Navigate to the profile dashboard
+  const handleProfileClick = async () => {
+    if (user && user.id) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error("Token is missing. Redirecting to login.");
+        navigate('/user-login');
+        return;
+      }
+
+      try {
+        // Fetch user profile data by ID
+        const response = await fetch(`http://localhost:8080/api/users/profile/id/${user.id}`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          navigate(`/profile/username/${user.userName}`); // Navigate to the profile page
+        } else if (response.status === 401) {
+          console.error("Unauthorized. Redirecting to login.");
+          navigate('/user-login');
+        } else {
+          console.error("Failed to fetch profile data.");
+        }
+      } catch (err) {
+        console.error("Error fetching profile data:", err);
+        navigate('/user-login');
+      }
+    } else {
+      console.error("User ID is undefined. Redirecting to login.");
+      navigate('/user-login');
+    }
   };
 
   // Handle Logout
@@ -81,6 +115,8 @@ function NavBar({ isDarkMode, toggleTheme, cart }) {
             src="https://www.logodesign.net/logo/smoking-burger-with-lettuce-3624ld.png"
             alt="FoodieExpress Logo"
             className="d-inline-block align-text-top me-2"
+            width="30"
+            height="30"
           />
           FoodieExpress
         </a>
@@ -141,7 +177,7 @@ function NavBar({ isDarkMode, toggleTheme, cart }) {
 
           {/* Display Search Results */}
           {searchResults.length > 0 && (
-            <div className="search-results">
+            <div className="search-results-dropdown">
               {searchResults.map((dish) => (
                 <div
                   key={dish.id}
@@ -164,8 +200,9 @@ function NavBar({ isDarkMode, toggleTheme, cart }) {
               className="nav-link"
               href="#"
               onClick={handleCartClick}
+              aria-label="Cart"
             >
-              <i className="fas fa-shopping-cart"></i>
+              <FontAwesomeIcon icon={faShoppingCart} />
               <span className="badge bg-danger ms-1">{cart.length}</span>
             </a>
           </div>
@@ -175,11 +212,11 @@ function NavBar({ isDarkMode, toggleTheme, cart }) {
             <button
               className="btn btn-outline-secondary theme-toggle"
               onClick={toggleTheme}
+              aria-label="Toggle Theme"
             >
               {isDarkMode ? '🌞 Light' : '🌙 Dark'}
             </button>
           </div>
-          
 
           {/* User Dropdown */}
           <div className="nav-item dropdown">
@@ -191,46 +228,46 @@ function NavBar({ isDarkMode, toggleTheme, cart }) {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              <i className="fas fa-user"></i>
-              {user && <span className="ms-2">{user.userName}</span>}
+              <FontAwesomeIcon icon={faUser} />
+              {user && <span className="ms-2">Hi, {user.userName}</span>}
             </a>
             <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
               {user ? (
                 // If user is logged in, show Profile and Logout
                 <>
                   <li>
-                    <a className="dropdown-item" href="#" onClick={handleProfileClick}>
+                    <button className="dropdown-item" onClick={handleProfileClick}>
                       Profile
-                    </a>
+                    </button>
                   </li>
                   <li>
-                    <a className="dropdown-item" href="#" onClick={handleLogout}>
+                    <button className="dropdown-item" onClick={handleLogout}>
                       Logout
-                    </a>
+                    </button>
                   </li>
                 </>
               ) : (
                 // If user is logged out, show Login and Registration options
                 <>
                   <li>
-                    <a className="dropdown-item" href="#" onClick={handleUserLoginClick}>
+                    <button className="dropdown-item" onClick={handleUserLoginClick}>
                       User Login
-                    </a>
+                    </button>
                   </li>
                   <li>
-                    <a className="dropdown-item" href="#" onClick={handleUserRegisterClick}>
+                    <button className="dropdown-item" onClick={handleUserRegisterClick}>
                       User Registration
-                    </a>
+                    </button>
                   </li>
                   <li>
-                    <a className="dropdown-item" href="#" onClick={handleAdminLoginClick}>
+                    <button className="dropdown-item" onClick={handleAdminLoginClick}>
                       Admin Login
-                    </a>
+                    </button>
                   </li>
                   <li>
-                    <a className="dropdown-item" href="#" onClick={handleRestaurantLoginClick}>
+                    <button className="dropdown-item" onClick={handleRestaurantLoginClick}>
                       Restaurant Login
-                    </a>
+                    </button>
                   </li>
                 </>
               )}

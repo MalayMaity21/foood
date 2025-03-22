@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import { UserContext } from "../context/UserContext"; // Import UserContext
-import "./css/ProfileDashboard.css"; // Import custom CSS
+import { useNavigate, useParams } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
+import "./css/ProfileDashboard.css";
 
-function ProfileDashboard() {
+function ProfileDashboard({ theme }) {
+  const { userName } = useParams(); // Extract userName from the URL
   const navigate = useNavigate();
-  const { user, setUser } = useContext(UserContext); // Access user and setUser from UserContext
+  const { user } = useContext(UserContext); // Access user from UserContext
   const [profileData, setProfileData] = useState({
     userName: "",
     email: "",
@@ -19,15 +20,21 @@ function ProfileDashboard() {
   // Fetch user profile data on component mount
   useEffect(() => {
     const fetchProfileData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate("/user-login"); // Redirect to login if no token is found
-          return;
-        }
+      if (!userName) {
+        console.error("UserName is undefined. Redirecting to login.");
+        navigate("/user-login");
+        return;
+      }
 
-        // Fetch profile data
-        const response = await fetch("http://localhost:8080/api/users/profile", {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Token is missing. Redirecting to login.");
+        navigate("/user-login");
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:8080/api/users/profile/username/${userName}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -37,14 +44,18 @@ function ProfileDashboard() {
         if (response.ok) {
           const data = await response.json();
           setProfileData({
-            userName: data.userName,
-            email: data.email,
-            mobNum: data.mobNum,
-            address: data.address,
-            dob: data.dob,
+            userName: data.userName || "N/A",
+            email: data.email || "N/A",
+            mobNum: data.mobNum || "N/A",
+            address: data.address || "N/A",
+            dob: data.dob ? new Date(data.dob).toISOString().split("T")[0] : "N/A",
           });
+        } else if (response.status === 401) {
+          console.error("Unauthorized. Redirecting to login.");
+          navigate("/user-login");
         } else {
-          setError("Failed to fetch profile data.");
+          const errorData = await response.json();
+          setError(errorData.message || "Failed to fetch profile data.");
         }
       } catch (err) {
         console.error("Error fetching profile data:", err);
@@ -53,10 +64,10 @@ function ProfileDashboard() {
     };
 
     fetchProfileData();
-  }, [navigate]);
+  }, [navigate, userName]);
 
   return (
-    <div className="profile-dashboard-container">
+    <div className={`profile-dashboard-container ${theme === 'dark' ? 'dark-theme' : 'light-theme'}`}>
       <div className="profile-dashboard-card">
         <h2 className="profile-dashboard-title">Profile Dashboard</h2>
         {error && <div className="profile-dashboard-error">{error}</div>}

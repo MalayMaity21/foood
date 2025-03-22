@@ -11,6 +11,8 @@ function UserRegister({ theme }) {
   const [address, setAddress] = useState('');
   const [dob, setDob] = useState('');
   const [error, setError] = useState('');
+  const [showModal, setShowModal] = useState(false); // State for modal visibility
+  const [modalMessage, setModalMessage] = useState(''); // State for modal message
 
   // Function to collect live location
   const getLiveLocation = () => {
@@ -57,14 +59,24 @@ function UserRegister({ theme }) {
       const data = await response.json();
 
       if (response.ok) {
-        navigate('/user-login'); // Redirect to login page after successful registration
+        setModalMessage('Registration successful! Redirecting to login...');
+        setShowModal(true);
+        setTimeout(() => {
+          navigate('/user-login'); // Redirect to login page after 3 seconds
+        }, 3000);
       } else {
-        setError(data.message || 'Registration failed');
+        setModalMessage(data.message || 'Registration failed');
+        setShowModal(true);
       }
     } catch (error) {
       console.error('Error during registration:', error); // Debug: Log error
-      setError('Server error. Please try again later.');
+      setModalMessage('Server error. Please try again later.');
+      setShowModal(true);
     }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
   };
 
   return (
@@ -165,6 +177,18 @@ function UserRegister({ theme }) {
           Already have an account? <a href="/user-login" className="login-link">Login here</a>.
         </p>
       </div>
+
+      {/* Modal for registration success/failure */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>{modalMessage}</h3>
+            <button onClick={closeModal} className="modal-close-button">
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
