@@ -20,8 +20,9 @@ function ProfileDashboard({ theme }) {
   // Fetch user profile data on component mount
   useEffect(() => {
     const fetchProfileData = async () => {
-      if (!userName) {
-        console.error("UserName is undefined. Redirecting to login.");
+      const userId = user?.id; // Assuming user ID is available in context
+      if (!userId) {
+        console.error("User ID is undefined. Redirecting to login.");
         navigate("/user-login");
         return;
       }
@@ -34,7 +35,7 @@ function ProfileDashboard({ theme }) {
       }
 
       try {
-        const response = await fetch(`http://localhost:8080/api/users/profile/username/${userName}`, {
+        const response = await fetch(`http://localhost:8080/api/users/profile/id/${userId}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -64,7 +65,7 @@ function ProfileDashboard({ theme }) {
     };
 
     fetchProfileData();
-  }, [navigate, userName]);
+  }, [navigate, user]);
 
   return (
     <div className={`profile-dashboard-container ${theme === 'dark' ? 'dark-theme' : 'light-theme'}`}>
