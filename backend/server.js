@@ -5,6 +5,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('./models/user');
+const Order = require('./models/orders');
 const { body, validationResult } = require('express-validator');
 require('dotenv').config();
 
@@ -172,6 +173,105 @@ app.post('/api/users/register', [
     res.status(201).json({ token, user: { id: user._id, userName: user.userName, email: user.email } });
   } catch (err) {
     console.error('Error during registration:', err);
+    res.status(500).json({ message: 'An internal server error occurred.' });
+  }
+});
+
+// Fetch all orders
+app.get('/api/orders', authenticateToken, async (req, res) => {
+  try {
+    const orders = await Order.find();
+    res.status(200).json(orders);
+  } catch (err) {
+    console.error('Error fetching orders:', err);
+    res.status(500).json({ message: 'An internal server error occurred.' });
+  }
+});
+
+// Fetch all menu items
+app.get('/api/menu', authenticateToken, async (req, res) => {
+  try {
+    const menuItems = await MenuItem.find();
+    res.status(200).json(menuItems);
+  } catch (err) {
+    console.error('Error fetching menu items:', err);
+    res.status(500).json({ message: 'An internal server error occurred.' });
+  }
+});
+
+// Fetch all promotions
+app.get('/api/promotions', authenticateToken, async (req, res) => {
+  try {
+    const promotions = await Promotion.find();
+    res.status(200).json(promotions);
+  } catch (err) {
+    console.error('Error fetching promotions:', err);
+    res.status(500).json({ message: 'An internal server error occurred.' });
+  }
+});
+
+// Fetch all restaurants
+app.get('/api/restaurants', authenticateToken, async (req, res) => {
+  try {
+    const restaurants = await Restaurant.find();
+    res.status(200).json(restaurants);
+  } catch (err) {
+    console.error('Error fetching restaurants:', err);
+    res.status(500).json({ message: 'An internal server error occurred.' });
+  }
+});
+
+// Add a new restaurant
+app.post('/api/restaurants', authenticateToken, async (req, res) => {
+  try {
+    const { name, location } = req.body;
+    const restaurant = new Restaurant({ name, location });
+    await restaurant.save();
+    res.status(201).json(restaurant);
+  } catch (err) {
+    console.error('Error adding restaurant:', err);
+    res.status(500).json({ message: 'An internal server error occurred.' });
+  }
+});
+
+// Update a restaurant
+app.put('/api/restaurants/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, location } = req.body;
+    const restaurant = await Restaurant.findByIdAndUpdate(id, { name, location }, { new: true });
+    if (!restaurant) {
+      return res.status(404).json({ message: 'Restaurant not found.' });
+    }
+    res.status(200).json(restaurant);
+  } catch (err) {
+    console.error('Error updating restaurant:', err);
+    res.status(500).json({ message: 'An internal server error occurred.' });
+  }
+});
+
+// Deactivate a restaurant
+app.patch('/api/restaurants/:id/deactivate', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const restaurant = await Restaurant.findByIdAndUpdate(id, { active: false }, { new: true });
+    if (!restaurant) {
+      return res.status(404).json({ message: 'Restaurant not found.' });
+    }
+    res.status(200).json(restaurant);
+  } catch (err) {
+    console.error('Error deactivating restaurant:', err);
+    res.status(500).json({ message: 'An internal server error occurred.' });
+  }
+});
+
+// Fetch all users
+app.get('/api/users', authenticateToken, async (req, res) => {
+  try {
+    const users = await User.find().select('-password'); // Exclude password
+    res.status(200).json(users);
+  } catch (err) {
+    console.error('Error fetching users:', err);
     res.status(500).json({ message: 'An internal server error occurred.' });
   }
 });
