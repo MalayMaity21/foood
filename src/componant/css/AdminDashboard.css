@@ -1,373 +1,119 @@
-/* AdminDashboard.css */
+/* Button styling */
+button {
+  padding: 8px 16px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: transparent;
+}
 
-/* General Styles */
-.flex {
-    display: flex;
+/* Default button */
+button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #333;
+}
+
+/* Active (selected) button */
+button:focus,
+button:active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+/* Custom active state for specific buttons */
+button.active {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  border-color: #007bff;
+}
+
+/* Button inside sidebar menu */
+button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+button:focus {
+  outline: none;
+  box-shadow: 0 0 5px 2px rgba(0, 123, 255, 0.6);
+}
+
+button.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+/* Sidebar responsiveness */
+@media (max-width: 768px) {
+  .flex {
+    flex-direction: column;
   }
-  
-  .min-h-screen {
-    min-height: 100vh;
-  }
-  
+
   .w-64 {
-    width: 16rem;
-  }
-  
-  .p-4 {
-    padding: 1rem;
-  }
-  
-  /* Theme-based Background Colors */
-  .bg-gray-800 {
-    background-color: #2d3748;
-  }
-  
-  .bg-white {
-    background-color: #ffffff;
-  }
-  
-  /* Theme-based Text Colors */
-  .text-white {
-    color: #ffffff;
-  }
-  
-  .text-black {
-    color: #000000;
-  }
-  
-  .text-xl {
-    font-size: 1.25rem;
-  }
-  
-  .text-2xl {
-    font-size: 1.5rem;
-  }
-  
-  .font-bold {
-    font-weight: 700;
-  }
-  
-  .mb-3 {
-    margin-bottom: 0.75rem;
-  }
-  
-  .mb-4 {
-    margin-bottom: 1rem;
-  }
-  
-  .mb-6 {
-    margin-bottom: 1.5rem;
-  }
-  
-  /* Hover Effects */
-  .hover\:text-gray-400:hover {
-    color: #a0aec0;
-    transition: color 0.3s ease;
-  }
-  
-  .hover\:bg-gray-700:hover {
-    background-color: #4a5568;
-    transition: background-color 0.3s ease;
-  }
-  
-  .shadow {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  .rounded-lg {
-    border-radius: 0.5rem;
-  }
-  
-  .grid {
-    display: grid;
-  }
-  
-  .grid-cols-1 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
-  
-  .grid-cols-2 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  
-  .grid-cols-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  
-  .gap-4 {
-    gap: 1rem;
-  }
-  
-  .gap-6 {
-    gap: 1.5rem;
-  }
-  
-  .p-2 {
-    padding: 0.5rem;
-  }
-  
-  /* Theme-based Button Colors */
-  .bg-blue-500 {
-    background-color: #3b82f6;
-  }
-  
-  .bg-blue-600:hover {
-    background-color: #2563eb;
-    transition: background-color 0.3s ease;
-  }
-  
-  .bg-green-500 {
-    background-color: #10b981;
-  }
-  
-  .bg-green-600:hover {
-    background-color: #059669;
-    transition: background-color 0.3s ease;
-  }
-  
-  .text-red-500 {
-    color: #ef4444;
-  }
-  
-  .text-red-600:hover {
-    color: #dc2626;
-    transition: color 0.3s ease;
-  }
-  
-  /* Padding Top */
-  .pt-6 {
-    padding-top: 1.5rem;
-  }
-  
-  .pt-8 {
-    padding-top: 2rem;
-  }
-  
-  /* Theme-based Table Styles */
-  .table-light {
-    background-color: #ffffff;
-    color: #000000;
-  }
-  
-  .table-dark {
-    background-color: #2d3748;
-    color: #ffffff;
-  }
-  
-  .table-light th,
-  .table-light td {
-    border-color: #e2e8f0;
-  }
-  
-  .table-dark th,
-  .table-dark td {
-    border-color: #4a5568;
-  }
-  
-  /* Additional Styles for Better Visual Appeal */
-  .transition-all {
-    transition: all 0.3s ease;
-  }
-  
-  .hover\:scale-105:hover {
-    transform: scale(1.05);
-  }
-  
-  .hover\:shadow-lg:hover {
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-  }
-  
-  .hover\:opacity-90:hover {
-    opacity: 0.9;
-  }
-  
-  /* Custom Scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
-  
-  /* Mobile Responsiveness */
-  @media (max-width: 768px) {
-    .flex {
-      flex-direction: column;
-    }
-  
-    .w-64 {
-      width: 100%;
-    }
-  
-    .p-4 {
-      padding: 0.5rem;
-    }
-  
-    .grid-cols-1,
-    .grid-cols-2,
-    .grid-cols-3 {
-      grid-template-columns: repeat(1, minmax(0, 1fr));
-    }
-  
-    .text-xl {
-      font-size: 1rem;
-    }
-  
-    .text-2xl {
-      font-size: 1.25rem;
-    }
-  
-    .mb-3 {
-      margin-bottom: 0.5rem;
-    }
-  
-    .mb-4 {
-      margin-bottom: 0.75rem;
-    }
-  
-    .mb-6 {
-      margin-bottom: 1rem;
-    }
-  
-    .gap-4 {
-      gap: 0.5rem;
-    }
-  
-    .gap-6 {
-      gap: 1rem;
-    }
-  
-    .p-2 {
-      padding: 0.25rem;
-    }
-  
-    .pt-6 {
-      padding-top: 1rem;
-    }
-  
-    .pt-8 {
-      padding-top: 1.5rem;
-    }
-  
-    /* Sidebar Toggle Button for Mobile */
-    .sidebar-toggle {
-      display: block;
-      position: fixed;
-      top: 1rem;
-      left: 1rem;
-      z-index: 1000;
-      background-color: #3b82f6;
-      color: white;
-      padding: 0.5rem;
-      border-radius: 0.25rem;
-      cursor: pointer;
-    }
-  
-    .sidebar-toggle:hover {
-      background-color: #2563eb;
-    }
-  
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: -16rem;
-      height: 100vh;
-      width: 16rem;
-      transition: left 0.3s ease;
-      z-index: 999;
-    }
-  
-    .sidebar.open {
-      left: 0;
-    }
-  }
-  
-  /* Additional Effects for Charts */
-  .chart-container {
-    background-color: white;
-    border-radius: 8px;
-    padding: 16px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .chart-container:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  }
-  
-  /* Custom Tooltip for Charts */
-  .recharts-tooltip {
-    background-color: rgba(255, 255, 255, 0.9) !important;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 4px !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-    padding: 8px !important;
-    color: #000000 !important;
-  }
-  
-  /* Custom Legend for Charts */
-  .recharts-legend-item {
-    cursor: pointer;
-    transition: opacity 0.3s ease;
-  }
-  
-  .recharts-legend-item:hover {
-    opacity: 0.7;
-  }
-  
-  /* Enhanced Styles for <li> Elements */
-  .sidebar-buttons li {
-    margin-bottom: 8px;
-    list-style-type: none;
-  }
-  
-  .sidebar-buttons li button {
     width: 100%;
-    text-align: left;
+    height: auto;
+  }
+
+  .w-full {
+    width: 100%;
+  }
+
+  .flex-1 {
+    width: 100%;
+  }
+
+  .p-4 {
+    padding: 16px;
+  }
+
+  /* Sidebar menu button styles on mobile */
+  .sidebar-btn {
+    font-size: 16px;
+  }
+}
+
+/* Table responsiveness */
+@media (max-width: 768px) {
+  table {
+    width: 100%;
+    overflow-x: auto;
+    display: block;
+  }
+
+  th, td {
     padding: 10px;
-    border-radius: 4px;
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+    text-align: left;
   }
-  
-  .sidebar-buttons li button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #3b82f6;
-    transform: translateX(5px);
+
+  th {
+    font-size: 14px;
   }
-  
-  .sidebar-buttons li button:active {
-    transform: scale(0.98);
+
+  td {
+    font-size: 12px;
   }
-  
-  /* Active Section Highlight */
-  .sidebar-buttons li button.active {
-    background-color: rgba(255, 255, 255, 0.2);
-    color: #3b82f6;
-    font-weight: bold;
+}
+
+/* Dashboard grid responsiveness */
+@media (max-width: 768px) {
+  .grid {
+    display: block;
   }
-  
-  /* Mobile Styles for <li> */
-  @media (max-width: 768px) {
-    .sidebar-buttons li {
-      margin-bottom: 4px;
-    }
-  
-    .sidebar-buttons li button {
-      padding: 8px;
-      font-size: 14px;
-    }
+
+  .grid-cols-1 {
+    grid-template-columns: 1fr;
   }
+
+  .grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+}
