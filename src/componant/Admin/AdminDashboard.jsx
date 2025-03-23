@@ -1,25 +1,87 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
+import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
+import axios from 'axios';
+import '../css/AdminDashboard.css';
 
 function AdminDashboard({ theme }) {
-  const [activeSection, setActiveSection] = useState('dashboard'); // State to manage active section
-  const [orders, setOrders] = useState([]); // State for orders
-  const [menuItems, setMenuItems] = useState([]); // State for menu items
-  const [users, setUsers] = useState([]); // State for users
-  const [promotions, setPromotions] = useState([]); // State for promotions
-  const navigate = useNavigate(); // Initialize navigate
+  const [activeSection, setActiveSection] = useState('dashboard');
+  const [orders, setOrders] = useState([]);
+  const [menuItems, setMenuItems] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [promotions, setPromotions] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
+  const [newRestaurant, setNewRestaurant] = useState({ name: '', location: '' });
+  const [editRestaurant, setEditRestaurant] = useState({ id: null, name: '', location: '' });
+  const navigate = useNavigate();
+
+  // Fetch all data from the backend
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        navigate('/admin-login');
+        return;
+      }
+
+      const headers = { Authorization: `Bearer ${token}` };
+
+      // Fetch orders
+      try {
+        const ordersResponse = await axios.get('http://localhost:5000/api/orders', { headers });
+        setOrders(ordersResponse.data);
+      } catch (err) {
+        console.error('Error fetching orders:', err);
+      }
+
+      // Fetch menu items
+      try {
+        const menuResponse = await axios.get('http://localhost:5000/api/menu', { headers });
+        setMenuItems(menuResponse.data);
+      } catch (err) {
+        console.error('Error fetching menu items:', err);
+      }
+
+      // Fetch users
+      try {
+        const usersResponse = await axios.get('http://localhost:5000/api/users', { headers });
+        setUsers(usersResponse.data);
+      } catch (err) {
+        console.error('Error fetching users:', err);
+      }
+
+      // Fetch promotions
+      try {
+        const promotionsResponse = await axios.get('http://localhost:5000/api/promotions', { headers });
+        setPromotions(promotionsResponse.data);
+      } catch (err) {
+        console.error('Error fetching promotions:', err);
+      }
+
+      // Fetch restaurants
+      try {
+        const restaurantsResponse = await axios.get('http://localhost:5000/api/restaurants', { headers });
+        setRestaurants(restaurantsResponse.data);
+      } catch (err) {
+        console.error('Error fetching restaurants:', err);
+      }
+    } catch (err) {
+      console.error('Error in fetchData:', err);
+      alert('Failed to fetch data. Please try again.');
+    }
+  };
 
   useEffect(() => {
-    // Check if admin is logged in
     const token = localStorage.getItem('adminToken');
     if (!token) {
       alert('Unauthorized access. Redirecting to login.');
-      navigate('/admin-login'); // Redirect to login if not authenticated
+      navigate('/admin-login');
+    } else {
+      fetchData();
     }
   }, [navigate]);
 
-  // Mock data for charts
+  // Mock data for charts (replace with API data if available)
   const salesData = [
     { name: 'Jan', sales: 4000 },
     { name: 'Feb', sales: 3000 },
@@ -36,34 +98,59 @@ function AdminDashboard({ theme }) {
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28']; // Colors for pie chart
 
-  // Fetch data (mock implementation)
-  useEffect(() => {
-    // Simulate fetching orders
-    setOrders([
-      { id: 1, customer: 'John Doe', total: 25, status: 'Completed' },
-      { id: 2, customer: 'Jane Smith', total: 30, status: 'Pending' },
-    ]);
+  // Deactivate a user
+  const deactivateUser = async (userId) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const headers = { Authorization: `Bearer ${token}` };
+      await axios.patch(`http://localhost:5000/api/users/${userId}/deactivate`, {}, { headers });
+      fetchData(); // Refresh data
+    } catch (err) {
+      console.error('Error deactivating user:', err);
+    }
+  };
 
-    // Simulate fetching menu items
-    setMenuItems([
-      { id: 1, name: 'Burger', price: 10, category: 'Fast Food' },
-      { id: 2, name: 'Pizza', price: 15, category: 'Fast Food' },
-    ]);
+  // Deactivate a restaurant
+  const deactivateRestaurant = async (restaurantId) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const headers = { Authorization: `Bearer ${token}` };
+      await axios.patch(`http://localhost:5000/api/restaurants/${restaurantId}/deactivate`, {}, { headers });
+      fetchData(); // Refresh data
+    } catch (err) {
+      console.error('Error deactivating restaurant:', err);
+    }
+  };
 
-    // Simulate fetching users
-    setUsers([
-      { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Customer' },
-      { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'Admin' },
-    ]);
+  // Add a new restaurant
+  const handleAddRestaurant = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('adminToken');
+      const headers = { Authorization: `Bearer ${token}` };
+      const response = await axios.post('http://localhost:5000/api/restaurants', newRestaurant, { headers });
+      setRestaurants([...restaurants, response.data]);
+      setNewRestaurant({ name: '', location: '' });
+    } catch (err) {
+      console.error('Error adding restaurant:', err);
+    }
+  };
 
-    // Simulate fetching promotions
-    setPromotions([
-      { id: 1, code: 'SAVE10', discount: '10%', validUntil: '2023-12-31' },
-      { id: 2, code: 'FREE5', discount: '$5', validUntil: '2023-11-30' },
-    ]);
-  }, []);
+  // Update a restaurant
+  const handleEditRestaurant = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('adminToken');
+      const headers = { Authorization: `Bearer ${token}` };
+      const response = await axios.put(`http://localhost:5000/api/restaurants/${editRestaurant._id}`, editRestaurant, { headers });
+      setRestaurants(restaurants.map((r) => (r._id === response.data._id ? response.data : r)));
+      setEditRestaurant({ id: null, name: '', location: '' });
+    } catch (err) {
+      console.error('Error updating restaurant:', err);
+    }
+  };
 
-  // Render active section
+  // Render the active section
   const renderSection = () => {
     switch (activeSection) {
       case 'dashboard':
@@ -73,15 +160,15 @@ function AdminDashboard({ theme }) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="bg-white p-4 rounded-lg shadow">
                 <h3 className="text-lg font-semibold">Total Orders</h3>
-                <p className="text-2xl">1,234</p>
+                <p className="text-2xl">{orders.length}</p>
               </div>
               <div className="bg-white p-4 rounded-lg shadow">
                 <h3 className="text-lg font-semibold">Revenue</h3>
-                <p className="text-2xl">$12,345</p>
+                <p className="text-2xl">${orders.reduce((sum, order) => sum + order.total, 0)}</p>
               </div>
               <div className="bg-white p-4 rounded-lg shadow">
                 <h3 className="text-lg font-semibold">Active Users</h3>
-                <p className="text-2xl">567</p>
+                <p className="text-2xl">{users.filter((user) => user.active).length}</p>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -181,16 +268,20 @@ function AdminDashboard({ theme }) {
                   <th className="p-2">User ID</th>
                   <th className="p-2">Name</th>
                   <th className="p-2">Email</th>
-                  <th className="p-2">Role</th>
+                  <th className="p-2">Mobile Number</th>
+                  <th className="p-2">Address</th>
+                  <th className="p-2">Date of Birth</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map((user) => (
-                  <tr key={user.id}>
-                    <td className="p-2 text-center">{user.id}</td>
-                    <td className="p-2 text-center">{user.name}</td>
+                  <tr key={user._id}>
+                    <td className="p-2 text-center">{user._id}</td>
+                    <td className="p-2 text-center">{user.userName}</td>
                     <td className="p-2 text-center">{user.email}</td>
-                    <td className="p-2 text-center">{user.role}</td>
+                    <td className="p-2 text-center">{user.mobNum}</td>
+                    <td className="p-2 text-center">{user.address}</td>
+                    <td className="p-2 text-center">{user.dob ? new Date(user.dob).toLocaleDateString() : 'N/A'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -223,6 +314,109 @@ function AdminDashboard({ theme }) {
             </table>
           </div>
         );
+      case 'restaurants':
+        return (
+          <div>
+            <h2 className="text-xl font-bold mb-4">Restaurant Management</h2>
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-2">Add New Restaurant</h3>
+              <form onSubmit={handleAddRestaurant} className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Restaurant Name"
+                  value={newRestaurant.name}
+                  onChange={(e) => setNewRestaurant({ ...newRestaurant, name: e.target.value })}
+                  className="p-2 border rounded"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Location"
+                  value={newRestaurant.location}
+                  onChange={(e) => setNewRestaurant({ ...newRestaurant, location: e.target.value })}
+                  className="p-2 border rounded"
+                  required
+                />
+                <button type="submit" className="p-2 bg-blue-500 text-white rounded">
+                  Add Restaurant
+                </button>
+              </form>
+            </div>
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-2">Edit Restaurant</h3>
+              <form onSubmit={handleEditRestaurant} className="flex gap-2">
+                <select
+                  value={editRestaurant._id || ''}
+                  onChange={(e) => {
+                    const selectedRestaurant = restaurants.find((r) => r._id === e.target.value);
+                    setEditRestaurant(selectedRestaurant ? { ...selectedRestaurant } : { id: null, name: '', location: '' });
+                  }}
+                  className="p-2 border rounded"
+                  required
+                >
+                  <option value="">Select Restaurant</option>
+                  {restaurants.map((restaurant) => (
+                    <option key={restaurant._id} value={restaurant._id}>
+                      {restaurant.name}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  placeholder="Restaurant Name"
+                  value={editRestaurant.name}
+                  onChange={(e) => setEditRestaurant({ ...editRestaurant, name: e.target.value })}
+                  className="p-2 border rounded"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Location"
+                  value={editRestaurant.location}
+                  onChange={(e) => setEditRestaurant({ ...editRestaurant, location: e.target.value })}
+                  className="p-2 border rounded"
+                  required
+                />
+                <button type="submit" className="p-2 bg-green-500 text-white rounded">
+                  Update Restaurant
+                </button>
+              </form>
+            </div>
+            <table className="w-full bg-white rounded-lg shadow">
+              <thead>
+                <tr>
+                  <th className="p-2">Restaurant ID</th>
+                  <th className="p-2">Name</th>
+                  <th className="p-2">Location</th>
+                  <th className="p-2">Status</th>
+                  <th className="p-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {restaurants.map((restaurant) => (
+                  <tr key={restaurant._id}>
+                    <td className="p-2 text-center">{restaurant._id}</td>
+                    <td className="p-2 text-center">{restaurant.name}</td>
+                    <td className="p-2 text-center">{restaurant.location}</td>
+                    <td className="p-2 text-center">
+                      {restaurant.active ? 'Active' : 'Deactivated'}
+                    </td>
+                    <td className="p-2 text-center">
+                      {restaurant.active && (
+                        <button
+                          onClick={() => deactivateRestaurant(restaurant._id)}
+                          className="text-red-500"
+                        >
+                          Deactivate
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
       default:
         return null;
     }
@@ -230,7 +424,6 @@ function AdminDashboard({ theme }) {
 
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar */}
       <div className={`w-64 p-4 ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
         <h1 className="text-2xl font-bold mb-6">Admin Panel</h1>
         <ul>
@@ -274,17 +467,20 @@ function AdminDashboard({ theme }) {
               Promotions
             </button>
           </li>
+          <li className="mb-3">
+            <button
+              onClick={() => setActiveSection('restaurants')}
+              className={`hover:text-gray-400 ${activeSection === 'restaurants' ? 'font-bold' : ''}`}
+            >
+              Restaurants
+            </button>
+          </li>
         </ul>
       </div>
-
-      {/* Main Content */}
       <div className="flex-1">
-        {/* Navbar */}
         <div className={`p-4 shadow ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-black'}`}>
           <h1 className="text-xl font-bold">Food Delivery Admin</h1>
         </div>
-
-        {/* Page Content */}
         <div className="p-6">{renderSection()}</div>
       </div>
     </div>
