@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell } fro
 import axios from 'axios';
 import '../css/AdminDashboard.css';
 
-function AdminDashboard({ theme }) {
+function AdminDashboard({ theme, toggleTheme }) {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [orders, setOrders] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
@@ -152,37 +152,41 @@ function AdminDashboard({ theme }) {
 
   // Render the active section
   const renderSection = () => {
+    const containerClass = theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-black';
+    const tableClass = theme === 'dark' ? 'table-dark' : 'table-light';
+    const buttonClass = theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200';
+
     switch (activeSection) {
       case 'dashboard':
         return (
-          <div>
+          <div className={containerClass}>
             <h2 className="text-xl font-bold mb-4">Dashboard Overview</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div className="bg-white p-4 rounded-lg shadow">
+              <div className={`p-4 rounded-lg shadow ${containerClass}`}>
                 <h3 className="text-lg font-semibold">Total Orders</h3>
                 <p className="text-2xl">{orders.length}</p>
               </div>
-              <div className="bg-white p-4 rounded-lg shadow">
+              <div className={`p-4 rounded-lg shadow ${containerClass}`}>
                 <h3 className="text-lg font-semibold">Revenue</h3>
                 <p className="text-2xl">${orders.reduce((sum, order) => sum + order.total, 0)}</p>
               </div>
-              <div className="bg-white p-4 rounded-lg shadow">
+              <div className={`p-4 rounded-lg shadow ${containerClass}`}>
                 <h3 className="text-lg font-semibold">Active Users</h3>
                 <p className="text-2xl">{users.filter((user) => user.active).length}</p>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white p-4 rounded-lg shadow">
+              <div className={`p-4 rounded-lg shadow ${containerClass}`}>
                 <h3 className="text-lg font-semibold mb-4">Monthly Sales</h3>
                 <BarChart width={500} height={300} data={salesData}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
+                  <XAxis dataKey="name" stroke={theme === 'dark' ? '#ffffff' : '#000000'} />
+                  <YAxis stroke={theme === 'dark' ? '#ffffff' : '#000000'} />
                   <Tooltip />
                   <Legend />
                   <Bar dataKey="sales" fill="#8884d8" />
                 </BarChart>
               </div>
-              <div className="bg-white p-4 rounded-lg shadow">
+              <div className={`p-4 rounded-lg shadow ${containerClass}`}>
                 <h3 className="text-lg font-semibold mb-4">Order Status</h3>
                 <PieChart width={500} height={300}>
                   <Pie
@@ -208,9 +212,9 @@ function AdminDashboard({ theme }) {
         );
       case 'orders':
         return (
-          <div>
+          <div className={containerClass}>
             <h2 className="text-xl font-bold mb-4">Order Management</h2>
-            <table className="w-full bg-white rounded-lg shadow">
+            <table className={`w-full rounded-lg shadow ${tableClass}`}>
               <thead>
                 <tr>
                   <th className="p-2">Order ID</th>
@@ -234,9 +238,9 @@ function AdminDashboard({ theme }) {
         );
       case 'menu':
         return (
-          <div>
+          <div className={containerClass}>
             <h2 className="text-xl font-bold mb-4">Menu Management</h2>
-            <table className="w-full bg-white rounded-lg shadow">
+            <table className={`w-full rounded-lg shadow ${tableClass}`}>
               <thead>
                 <tr>
                   <th className="p-2">Item ID</th>
@@ -260,9 +264,9 @@ function AdminDashboard({ theme }) {
         );
       case 'users':
         return (
-          <div>
+          <div className={containerClass}>
             <h2 className="text-xl font-bold mb-4">User Management</h2>
-            <table className="w-full bg-white rounded-lg shadow">
+            <table className={`w-full rounded-lg shadow ${tableClass}`}>
               <thead>
                 <tr>
                   <th className="p-2">User ID</th>
@@ -290,9 +294,9 @@ function AdminDashboard({ theme }) {
         );
       case 'promotions':
         return (
-          <div>
+          <div className={containerClass}>
             <h2 className="text-xl font-bold mb-4">Promotions</h2>
-            <table className="w-full bg-white rounded-lg shadow">
+            <table className={`w-full rounded-lg shadow ${tableClass}`}>
               <thead>
                 <tr>
                   <th className="p-2">Promo ID</th>
@@ -316,7 +320,7 @@ function AdminDashboard({ theme }) {
         );
       case 'restaurants':
         return (
-          <div>
+          <div className={containerClass}>
             <h2 className="text-xl font-bold mb-4">Restaurant Management</h2>
             <div className="mb-6">
               <h3 className="text-lg font-semibold mb-2">Add New Restaurant</h3>
@@ -326,7 +330,7 @@ function AdminDashboard({ theme }) {
                   placeholder="Restaurant Name"
                   value={newRestaurant.name}
                   onChange={(e) => setNewRestaurant({ ...newRestaurant, name: e.target.value })}
-                  className="p-2 border rounded"
+                  className={`p-2 border rounded ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-black'}`}
                   required
                 />
                 <input
@@ -334,10 +338,10 @@ function AdminDashboard({ theme }) {
                   placeholder="Location"
                   value={newRestaurant.location}
                   onChange={(e) => setNewRestaurant({ ...newRestaurant, location: e.target.value })}
-                  className="p-2 border rounded"
+                  className={`p-2 border rounded ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-black'}`}
                   required
                 />
-                <button type="submit" className="p-2 bg-blue-500 text-white rounded">
+                <button type="submit" className={`p-2 rounded ${buttonClass}`}>
                   Add Restaurant
                 </button>
               </form>
@@ -351,7 +355,7 @@ function AdminDashboard({ theme }) {
                     const selectedRestaurant = restaurants.find((r) => r._id === e.target.value);
                     setEditRestaurant(selectedRestaurant ? { ...selectedRestaurant } : { id: null, name: '', location: '' });
                   }}
-                  className="p-2 border rounded"
+                  className={`p-2 border rounded ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-black'}`}
                   required
                 >
                   <option value="">Select Restaurant</option>
@@ -366,7 +370,7 @@ function AdminDashboard({ theme }) {
                   placeholder="Restaurant Name"
                   value={editRestaurant.name}
                   onChange={(e) => setEditRestaurant({ ...editRestaurant, name: e.target.value })}
-                  className="p-2 border rounded"
+                  className={`p-2 border rounded ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-black'}`}
                   required
                 />
                 <input
@@ -374,15 +378,15 @@ function AdminDashboard({ theme }) {
                   placeholder="Location"
                   value={editRestaurant.location}
                   onChange={(e) => setEditRestaurant({ ...editRestaurant, location: e.target.value })}
-                  className="p-2 border rounded"
+                  className={`p-2 border rounded ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-black'}`}
                   required
                 />
-                <button type="submit" className="p-2 bg-green-500 text-white rounded">
+                <button type="submit" className={`p-2 rounded ${buttonClass}`}>
                   Update Restaurant
                 </button>
               </form>
             </div>
-            <table className="w-full bg-white rounded-lg shadow">
+            <table className={`w-full rounded-lg shadow ${tableClass}`}>
               <thead>
                 <tr>
                   <th className="p-2">Restaurant ID</th>
@@ -405,7 +409,7 @@ function AdminDashboard({ theme }) {
                       {restaurant.active && (
                         <button
                           onClick={() => deactivateRestaurant(restaurant._id)}
-                          className="text-red-500"
+                          className="text-red-500 hover:text-red-600 transition-colors"
                         >
                           Deactivate
                         </button>
@@ -423,54 +427,66 @@ function AdminDashboard({ theme }) {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className={`flex min-h-screen mt-16 ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-black'}`}>
       <div className={`w-64 p-4 ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
         <h1 className="text-2xl font-bold mb-6">Admin Panel</h1>
-        <ul>
-          <li className="mb-3">
+        <ul className="sidebar-buttons">
+          <li>
             <button
               onClick={() => setActiveSection('dashboard')}
-              className={`hover:text-gray-400 ${activeSection === 'dashboard' ? 'font-bold' : ''}`}
+              className={`w-full text-left p-2 rounded ${
+                theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+              } ${activeSection === 'dashboard' ? (theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100') : ''}`}
             >
               Dashboard
             </button>
           </li>
-          <li className="mb-3">
+          <li>
             <button
               onClick={() => setActiveSection('orders')}
-              className={`hover:text-gray-400 ${activeSection === 'orders' ? 'font-bold' : ''}`}
+              className={`w-full text-left p-2 rounded ${
+                theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+              } ${activeSection === 'orders' ? (theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100') : ''}`}
             >
               Orders
             </button>
           </li>
-          <li className="mb-3">
+          <li>
             <button
               onClick={() => setActiveSection('menu')}
-              className={`hover:text-gray-400 ${activeSection === 'menu' ? 'font-bold' : ''}`}
+              className={`w-full text-left p-2 rounded ${
+                theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+              } ${activeSection === 'menu' ? (theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100') : ''}`}
             >
               Menu
             </button>
           </li>
-          <li className="mb-3">
+          <li>
             <button
               onClick={() => setActiveSection('users')}
-              className={`hover:text-gray-400 ${activeSection === 'users' ? 'font-bold' : ''}`}
+              className={`w-full text-left p-2 rounded ${
+                theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+              } ${activeSection === 'users' ? (theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100') : ''}`}
             >
               Users
             </button>
           </li>
-          <li className="mb-3">
+          <li>
             <button
               onClick={() => setActiveSection('promotions')}
-              className={`hover:text-gray-400 ${activeSection === 'promotions' ? 'font-bold' : ''}`}
+              className={`w-full text-left p-2 rounded ${
+                theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+              } ${activeSection === 'promotions' ? (theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100') : ''}`}
             >
               Promotions
             </button>
           </li>
-          <li className="mb-3">
+          <li>
             <button
               onClick={() => setActiveSection('restaurants')}
-              className={`hover:text-gray-400 ${activeSection === 'restaurants' ? 'font-bold' : ''}`}
+              className={`w-full text-left p-2 rounded ${
+                theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+              } ${activeSection === 'restaurants' ? (theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100') : ''}`}
             >
               Restaurants
             </button>
@@ -480,6 +496,7 @@ function AdminDashboard({ theme }) {
       <div className="flex-1">
         <div className={`p-4 shadow ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-black'}`}>
           <h1 className="text-xl font-bold">Food Delivery Admin</h1>
+          
         </div>
         <div className="p-6">{renderSection()}</div>
       </div>
