@@ -1,6 +1,6 @@
 import React from 'react';
-import restaurants from '../services/restaurants.json';
-import './css/RestaurantList.css';
+import restaurants from '../../services/restaurants.json';
+import '../css/RestaurantList.css';
 
 const RestaurantList = ({ theme }) => {
   return (

@@ -3,8 +3,9 @@ const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs'); // For password hashing and validation
-const User = require('./models/user'); // Import the User model
+const bcrypt = require('bcryptjs');
+const User = require('./models/user');
+const { body, validationResult } = require('express-validator');
 require('dotenv').config();
 
 const app = express();
@@ -13,7 +14,11 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+  origin: 'http://localhost:5173', // Replace with your frontend URL
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Authentication Middleware
@@ -35,14 +40,11 @@ app.use('/users', userRoutes);
 // Fetch User Profile Data by ID
 app.get('/api/users/profile/id/:id', authenticateToken, async (req, res) => {
   try {
-    const userId = req.params.id; // Extract user ID from the URL
-
-    // Fetch user data from MongoDB
-    const user = await User.findById(userId).select('-password'); // Exclude password field
+    const userId = req.params.id;
+    const user = await User.findById(userId).select('-password');
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
     }
-
     res.status(200).json({
       userName: user.userName,
       email: user.email,
@@ -59,14 +61,11 @@ app.get('/api/users/profile/id/:id', authenticateToken, async (req, res) => {
 // Fetch User Profile Data by Email
 app.get('/api/users/profile/email/:email', authenticateToken, async (req, res) => {
   try {
-    const userEmail = req.params.email; // Extract email from the URL
-
-    // Fetch user data from MongoDB
+    const userEmail = req.params.email;
     const user = await User.findOne({ email: userEmail }).select('-password');
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
     }
-
     res.status(200).json({
       userName: user.userName,
       email: user.email,
@@ -81,25 +80,28 @@ app.get('/api/users/profile/email/:email', authenticateToken, async (req, res) =
 });
 
 // User Login
-app.post('/api/users/login', async (req, res) => {
+app.post('/api/users/login', [
+  body('email').isEmail().withMessage('Invalid email address.'),
+  body('password').notEmpty().withMessage('Password is required.'),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { email, password } = req.body;
-
-    // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
     }
 
-    // Validate password (assuming bcrypt is used)
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
 
-    // Generate token with user ID
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
     res.status(200).json({ token, user: { id: user._id, userName: user.userName, email: user.email } });
   } catch (err) {
     console.error('Error during login:', err);
@@ -107,22 +109,54 @@ app.post('/api/users/login', async (req, res) => {
   }
 });
 
+// Admin Login
+app.post('/api/admin/login', [
+  body('username').notEmpty().withMessage('Username is required.'),
+  body('password').notEmpty().withMessage('Password is required.'),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { username, password } = req.body;
+
+    // Validate admin credentials
+    if (username !== process.env.ADMIN_USERNAME || password !== process.env.ADMIN_PASSWORD) {
+      return res.status(401).json({ message: 'Invalid admin credentials.' });
+    }
+
+    // Generate token for admin
+    const token = jwt.sign({ username, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.status(200).json({ token, admin: { username } });
+  } catch (err) {
+    console.error('Error during admin login:', err);
+    res.status(500).json({ message: 'An internal server error occurred.' });
+  }
+});
+
 // User Registration
-app.post('/api/users/register', async (req, res) => {
+app.post('/api/users/register', [
+  body('userName').notEmpty().withMessage('Username is required.'),
+  body('email').isEmail().withMessage('Invalid email address.'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long.'),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { userName, email, password, mobNum, address, dob } = req.body;
-
-    // Check if user already exists
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: 'User already exists.' });
     }
 
-    // Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create a new user
     user = new User({
       userName,
       email,
@@ -132,17 +166,20 @@ app.post('/api/users/register', async (req, res) => {
       dob,
     });
 
-    // Save the user to the database
     await user.save();
 
-    // Generate token with user ID
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
     res.status(201).json({ token, user: { id: user._id, userName: user.userName, email: user.email } });
   } catch (err) {
     console.error('Error during registration:', err);
     res.status(500).json({ message: 'An internal server error occurred.' });
   }
+});
+
+// Centralized Error Handling
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ message: 'An internal server error occurred.' });
 });
 
 // Start the server

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { UserContext } from "../context/UserContext";
-import "./css/ProfileDashboard.css";
+import { UserContext } from "../../context/UserContext";
+import "../css/ProfileDashboard.css";
 
 function ProfileDashboard({ theme }) {
   const { userName } = useParams(); // Extract userName from the URL

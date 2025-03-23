@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom'; // Added useNavigate
-import './css/ProductDetails.css'; // Import custom CSS for product details
-import dishes from '../services/api.json'; // Import the JSON data directly
+import '../css/ProductDetails.css'; // Import custom CSS for product details
+import dishes from '../../services/api.json'; // Import the JSON data directly
 import { toast, ToastContainer } from 'react-toastify'; // For toast notifications
 import 'react-toastify/dist/ReactToastify.css'; // Toast notification styles
 

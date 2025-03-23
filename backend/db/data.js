@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const bcrypt = require("bcryptjs"); // Add bcrypt for password hashing
 const User = require("../models/user");
 const Product = require("../models/product");
 const Order = require("../models/orders");
@@ -36,6 +37,16 @@ const foodData = [
   // Add more food items as needed
 ];
 
+// Hash passwords before inserting users
+const hashPasswords = async (users) => {
+  return Promise.all(
+    users.map(async (user) => ({
+      ...user,
+      password: await bcrypt.hash(user.password, 10), // Hash the password
+    }))
+  );
+};
+
 // Insert data into the database
 const insertData = async () => {
   try {
@@ -44,7 +55,8 @@ const insertData = async () => {
     await Product.deleteMany();
     await Order.deleteMany();
 
-    const createdUsers = await User.insertMany(users);
+    const hashedUsers = await hashPasswords(users); // Hash passwords
+    const createdUsers = await User.insertMany(hashedUsers);
     const createdProducts = await Product.insertMany(foodData);
 
     console.log("Users and Products inserted successfully");
