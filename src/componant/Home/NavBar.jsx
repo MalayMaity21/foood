@@ -5,13 +5,13 @@ import '../css/NavBar.css';
 import dishes from '../../services/api.json';
 import { UserContext } from '../../context/UserContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingCart, faUser, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 
 function NavBar({ isDarkMode, toggleTheme, cart = [] }) {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const { user, setUser } = useContext(UserContext); // Accessing the user context
+  const { user, setUser } = useContext(UserContext);
 
   // Handle Admin Login click
   const handleAdminLoginClick = () => {
@@ -49,7 +49,6 @@ function NavBar({ isDarkMode, toggleTheme, cart = [] }) {
       }
 
       try {
-        // Fetch user profile data by ID
         const response = await fetch(`http://localhost:8080/api/users/profile/id/${user.id}`, {
           method: 'GET',
           headers: {
@@ -58,7 +57,7 @@ function NavBar({ isDarkMode, toggleTheme, cart = [] }) {
         });
 
         if (response.ok) {
-          navigate(`/profile/username/${user.userName}`); // Navigate to the profile page
+          navigate(`/profile/username/${user.userName}`);
         } else if (response.status === 401) {
           console.error("Unauthorized. Redirecting to login.");
           navigate('/user-login');
@@ -78,8 +77,8 @@ function NavBar({ isDarkMode, toggleTheme, cart = [] }) {
   // Handle Logout
   const handleLogout = () => {
     localStorage.removeItem('token');
-    setUser(null); // Clear user context
-    navigate('/'); // Redirect to home page
+    setUser(null);
+    navigate('/');
   };
 
   // Handle Search Input Change
@@ -87,7 +86,6 @@ function NavBar({ isDarkMode, toggleTheme, cart = [] }) {
     const query = e.target.value;
     setSearchQuery(query);
 
-    // Filter dishes based on the search query
     if (query.trim() === '') {
       setSearchResults([]);
     } else {
@@ -107,9 +105,9 @@ function NavBar({ isDarkMode, toggleTheme, cart = [] }) {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <nav className={`navbar navbar-expand-lg navbar-light ${isDarkMode ? 'dark' : 'bg-light'} fixed-top`}>
       <div className="container-fluid">
-        {/* Brand Logo with Sample Image */}
+        {/* Brand Logo */}
         <a className="navbar-brand" href="/">
           <img
             src="https://www.logodesign.net/logo/smoking-burger-with-lettuce-3624ld.png"
@@ -121,7 +119,7 @@ function NavBar({ isDarkMode, toggleTheme, cart = [] }) {
           FoodieExpress
         </a>
 
-        {/* Hamburger Menu for Mobile */}
+        {/* Hamburger Menu */}
         <button
           className="navbar-toggler"
           type="button"
@@ -134,7 +132,7 @@ function NavBar({ isDarkMode, toggleTheme, cart = [] }) {
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Navbar Links and Additional Elements */}
+        {/* Navbar Content */}
         <div className="collapse navbar-collapse" id="navbarNav">
           {/* Main Navigation Links */}
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
@@ -144,24 +142,19 @@ function NavBar({ isDarkMode, toggleTheme, cart = [] }) {
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">
+              <a className="nav-link" href="/menu">
                 Menu
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">
-                Order Online
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#">
+              <a className="nav-link" href="/contact-us">
                 Contact Us
               </a>
             </li>
           </ul>
 
-          {/* Search Bar */}
-          <form className="d-flex me-3" onSubmit={handleSearchSubmit}>
+          {/* Search Bar with Results */}
+          <form className="d-flex search-container" onSubmit={handleSearchSubmit}>
             <input
               className="form-control me-2"
               type="search"
@@ -173,26 +166,24 @@ function NavBar({ isDarkMode, toggleTheme, cart = [] }) {
             <button className="btn btn-outline-success" type="submit">
               Search
             </button>
-          </form>
-
-          {/* Display Search Results */}
-          {searchResults.length > 0 && (
-            <div className="search-results-dropdown">
-              {searchResults.map((dish) => (
-                <div
-                  key={dish.id}
-                  className="search-result-item"
-                  onClick={() => navigate(`/dish/${dish.id}`)}
-                >
-                  <img src={dish.imageUrl} alt={dish.name} className="search-result-image" />
-                  <div className="search-result-details">
-                    <h5>{dish.name}</h5>
-                    <p>${dish.price.toFixed(2)}</p>
+            {searchResults.length > 0 && (
+              <div className="search-results-dropdown">
+                {searchResults.map((dish) => (
+                  <div
+                    key={dish.id}
+                    className="search-result-item"
+                    onClick={() => navigate(`/dish/${dish.id}`)}
+                  >
+                    <img src={dish.imageUrl} alt={dish.name} className="search-result-image" />
+                    <div className="search-result-details">
+                      <h5>{dish.name}</h5>
+                      <p>${dish.price.toFixed(2)}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </form>
 
           {/* Cart Icon */}
           <div className="nav-item me-3">
@@ -210,11 +201,12 @@ function NavBar({ isDarkMode, toggleTheme, cart = [] }) {
           {/* Theme Toggle Button */}
           <div className="nav-item me-3">
             <button
-              className="btn btn-outline-secondary theme-toggle"
+              className="btn theme-toggle-button"
               onClick={toggleTheme}
               aria-label="Toggle Theme"
             >
-              {isDarkMode ? '🌞 Light' : '🌙 Dark'}
+              <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} />
+              <span className="ms-2">{isDarkMode ? 'Light' : 'Dark'}</span>
             </button>
           </div>
 
@@ -234,14 +226,12 @@ function NavBar({ isDarkMode, toggleTheme, cart = [] }) {
             <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
               {user ? (
                 user.isAdmin ? (
-                  // If admin is logged in, show only Logout
                   <li>
                     <button className="dropdown-item" onClick={handleLogout}>
                       Logout
                     </button>
                   </li>
                 ) : (
-                  // If regular user is logged in, show Profile and Logout
                   <>
                     <li>
                       <button className="dropdown-item" onClick={handleProfileClick}>
@@ -256,7 +246,6 @@ function NavBar({ isDarkMode, toggleTheme, cart = [] }) {
                   </>
                 )
               ) : (
-                // If user is logged out, show Login and Registration options
                 <>
                   <li>
                     <button className="dropdown-item" onClick={handleUserLoginClick}>

@@ -1,0 +1,122 @@
+.menu-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .menu-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .menu-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+  }
+  
+  .menu-subtitle {
+    font-size: 1.2rem;
+    color: #7f8c8d;
+  }
+  
+  .menu-category {
+    margin-bottom: 3rem;
+  }
+  
+  .category-title {
+    font-size: 1.8rem;
+    color: #e74c3c;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #f1f1f1;
+  }
+  
+  .category-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+  
+  .menu-item {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .menu-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .item-image-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+  }
+  
+  .item-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .menu-item:hover .item-image {
+    transform: scale(1.05);
+  }
+  
+  .item-details {
+    padding: 1.5rem;
+  }
+  
+  .item-name {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+  }
+  
+  .item-description {
+    color: #7f8c8d;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .item-price-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .item-price {
+    font-weight: bold;
+    color: #e74c3c;
+    font-size: 1.2rem;
+  }
+  
+  .vegetarian-badge {
+    background-color: #27ae60;
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .menu-container {
+      padding: 1rem;
+    }
+    
+    .category-items {
+      grid-template-columns: 1fr;
+    }
+    
+    .menu-title {
+      font-size: 2rem;
+    }
+  }

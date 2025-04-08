@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Added Navigate
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import NavBar from "./componant/Home/NavBar.jsx";
 import Home from "./componant/Home/Home.jsx";
 import Offer from "./componant/Home/Offer.jsx";
@@ -7,7 +7,7 @@ import './App.css';
 import Category from './componant/Home/Category.jsx';
 import CartPage from './componant/Home/CartPage.jsx';
 import AdminLogin from './componant/Admin/AdminLogin.jsx';
-import AdminDashboard from './componant/Admin/AdminDashboard.jsx'; // Import AdminDashboard
+import AdminDashboard from './componant/Admin/AdminDashboard.jsx';
 import UserLogin from './componant/User/UserLogin.jsx';
 import UserRegister from './componant/User/UserRegister.jsx';
 import RestaurantLogin from './componant/Restaurant/RestaurantLogin.jsx';
@@ -16,7 +16,9 @@ import ProductDetails from './componant/Product/ProductDetails.jsx';
 import RestaurantList from './componant/Restaurant/RestaurantList.jsx';
 import ProfileDashboard from './componant/User/ProfileDashboard.jsx';
 import { UserProvider } from './context/UserContext.jsx';
-import { AuthProvider, useAuth } from './context/AuthContext.jsx'; // Import AuthProvider and useAuth
+import { AuthProvider, useAuth } from './context/AuthContext.jsx';
+import MenuPage from './componant/Home/Menu.jsx'; // Import the new MenuPage component
+import ContactPage from './componant/Home/ContactUs.jsx'; // Import the new ContactPage component
 
 // PrivateRoute component to protect routes
 const PrivateRoute = ({ children }) => {
@@ -25,15 +27,13 @@ const PrivateRoute = ({ children }) => {
 };
 
 function App() {
-  const [theme, setTheme] = useState('light'); // State for theme
-  const [cart, setCart] = useState([]); // State for cart items
+  const [theme, setTheme] = useState('light');
+  const [cart, setCart] = useState([]);
 
-  // Toggle theme between light and dark
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
-  // Apply theme to the entire app
   useEffect(() => {
     if (theme === 'dark') {
       document.body.classList.add('dark');
@@ -42,21 +42,19 @@ function App() {
     }
   }, [theme]);
 
-  // Add item to cart
   const handleAddToCart = (dish) => {
-    if (!cart.some((item) => item.id === dish.id)) { // Prevent duplicates
+    if (!cart.some((item) => item.id === dish.id)) {
       setCart([...cart, dish]);
     }
   };
 
-  // Handle checkout
   const handleCheckout = () => {
     alert('Thank you for your purchase!');
-    setCart([]); // Clear the cart
+    setCart([]);
   };
 
   return (
-    <AuthProvider> {/* Wrap the app with AuthProvider */}
+    <AuthProvider>
       <UserProvider>
         <Router>
           <div className={`app ${theme === 'dark' ? 'dark-theme' : 'light-theme'}`}>
@@ -85,7 +83,7 @@ function App() {
                 }
               />
               <Route path="/admin-login" element={<AdminLogin theme={theme} />} />
-              <Route path="/admin-dashboard" element={<PrivateRoute><AdminDashboard theme={theme} /></PrivateRoute>} /> {/* Secured AdminDashboard */}
+              <Route path="/admin-dashboard" element={<PrivateRoute><AdminDashboard theme={theme} /></PrivateRoute>} />
               <Route path="/cart" element={<CartPage cart={cart} handleCheckout={handleCheckout} theme={theme} />} />
               <Route path="/user-login" element={<UserLogin theme={theme} />} />
               <Route path="/user-register" element={<UserRegister theme={theme} />} />
@@ -93,6 +91,11 @@ function App() {
               <Route path="/restaurant_page" element={<RestaurantPage theme={theme} />} />
               <Route path="/productDetails/:id" element={<ProductDetails theme={theme} />} />
               <Route path="/profile/username/:userName" element={<ProfileDashboard theme={theme} />} />
+              
+              {/* New routes added */}
+              <Route path="/menu" element={<MenuPage theme={theme} handleAddToCart={handleAddToCart} />} />
+              <Route path="/contact" element={<ContactPage theme={theme} />} />
+              <Route path="/contact-us" element={<Navigate to="/contact" />} /> {/* Redirect for consistency */}
             </Routes>
 
             <footer className={`footer ${theme === 'dark' ? 'dark-theme' : 'light-theme'}`}>
@@ -112,7 +115,7 @@ function App() {
                   <h3>Contact Us</h3>
                   <p>Barasat, Kolkata</p>
                   <p>Kolkata, 700124</p>
-                  <p>Email: info@FoodieExpress.com</p>
+                  <p>Email: infofoodieexpressmilanmalay@gmail.com</p>
                 </div>
 
                 <div className="footer-section">
